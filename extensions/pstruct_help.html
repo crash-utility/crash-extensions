@@ -1,0 +1,52 @@
+<html>
+
+<head>
+<meta http-equiv="expires" content="Wed, 19 Feb 2003 08:00:00 GMT">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#000066" vlink="#333399" alink="#FF0000">
+<pre>
+
+
+NAME
+  pstruct - print structure member's data in one line
+
+SYNOPSIS
+  pstruct struct_name.member[.member...,member...] [-d|-x] [-l offset]
+    [address|symbol]
+
+DESCRIPTION
+  This command displays the contents of a structure's members in one
+  line.
+
+  The arguments are as follows:
+
+  struct_name  name of a C-code structure used by the kernel.
+   .member...  name of a structure member; to display multiple members
+               of a structure, use a comma-separated list of members.
+    -l offset  if the address argument is a pointer to a structure
+               member that is contained by the target data structure,
+               typically a pointer to an embedded list_head, the offset
+               to the embedded member may be entered in either of the
+               following manners:
+                   1. in "structure.member" format.
+                   2. a number of bytes. 
+           -x  override default output format with hexadecimal format.
+           -d  override default output format with decimal format.
+  
+
+EXAMPLE
+  Display the page's member private, _count.counter, inuse at address 
+  0xffffea00000308f0:
+
+    crash> pstruct page.private,_count.counter,inuse 0xffffea00000308f0
+    0       198896  59904
+ 
+  Display the page's member mapping, index at address 0xffffea00000308f0
+  in hexadecimal format:
+
+    crash> pstruct page.mapping,index ffffea000004c778 -x
+    0xffff88004b6412b8      0x100167
+
+
+</pre>
+</html>

@@ -1,0 +1,66 @@
+<html>
+
+<head>
+<meta http-equiv="expires" content="Wed, 19 Feb 2003 08:00:00 GMT">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#000066" vlink="#333399" alink="#FF0000">
+<pre>
+
+NAME
+  ccat - dump page caches
+
+SYNOPSIS
+  ccat    [-S] [-n pid|task] abspath|inode [outfile]
+  ccat -d [-S] [-n pid|task] abspath outdir
+
+DESCRIPTION
+  This command dumps the page caches of a specified inode or path like
+  "cat" command.
+
+       -d  extract a directory and its contents to outdir.
+       -S  do not fseek() and ftruncate() to outfile in order to
+           create a non-sparse file.
+    inode  a hexadecimal inode pointer.
+  abspath  the absolute path of a file (or directory with the -d option).
+  outfile  a file path to be written. If a file already exists there,
+           the command fails.
+   outdir  a directory path to be created by the -d option.
+
+  For kernels supporting mount namespaces, the -n option may be used to
+  specify a task that has the target namespace:
+
+    -n pid   a process PID.
+    -n task  a hexadecimal task_struct pointer.
+
+EXAMPLE
+  Dump the existing page caches of the "/var/log/messages" file:
+
+    crash> ccat /var/log/messages
+    Sep 16 03:13:01 host systemd: Started Session 559694 of user root.
+    Sep 16 03:13:01 host systemd: Starting Session 559694 of user root.
+    Sep 16 03:13:39 host dnsmasq-dhcp[24341]: DHCPREQUEST(virbr0) 192.168
+    Sep 16 03:13:39 host dnsmasq-dhcp[24341]: DHCPACK(virbr0) 192.168.122
+    ...
+
+  Restore the size and data offset of the "messages" file as well to the
+  "messages.sparse" file even if some of its page caches don't exist, so
+  it could become sparse:
+
+    crash> ccat /var/log/messages messages.sparse
+
+  Create the non-sparse "messages.non-sparse" file:
+
+    crash> ccat -S /var/log/messages messages.non-sparse
+
+  NOTE: Redirecting to a file will also works, but it can includes crash's
+  messages, so specifying an outfile is recommended for restoring a file.
+
+  Extract the "/var/log" directory and its contents to the new "/tmp/log"
+  directory with one command:
+
+    crash> ccat -d /var/log /tmp/log
+
+
+</pre>
+</html>
+

@@ -1,0 +1,198 @@
+<html>
+
+<head>
+<meta http-equiv="expires" content="Wed, 19 Feb 2003 08:00:00 GMT">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#000066" vlink="#333399" alink="#FF0000">
+<pre>
+
+NAME
+  dminfo - device mapper (dm) information
+
+SYNOPSIS
+  dminfo [-b bio | -d | -l | -q | -s | -t]
+
+DESCRIPTION
+  This command displays information about device-mapper mapped 
+  devices (dm devices).
+  If no argument is entered, displays lists of existing dm devices.
+  It's same as -l option.
+
+    -b bio  displays the information of the dm device which the bio
+            is submitted in.  If the bio isn't for dm devices,
+            results will be error.
+        -d  displays dependency information for existing dm devices.
+        -l  displays lists of existing dm devices.
+        -q  displays queued I/O information for each target of
+            existing dm devices.
+        -s  displays status information for each target of existing
+            dm devices.
+        -t  displays table information for each target of existing
+            dm devices.
+
+EXAMPLE
+  Display lists of dm devices.  "MAP_DEV" is the address of the
+  struct mapped_device.  "DM_TABLE" is the address of the struct
+  dm_table.  "TARGETS" is the number of targets which are in
+  the struct dm_table.
+
+    crash> dminfo
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  8    c4866c80          c4866280          1        vg0-snap0
+    253  6    f6a04a80          f6a04580          1        vg0-lv0-real
+    253  0    c4840380          c4841880          1        mp0
+    253  5    f7c50c80          c488e480          1        via_cbeheddbdd
+    253  7    c4866a80          c4866380          1        vg0-snap0-cow
+    253  4    d441e280          c919ed80          1        dummy1
+    253  3    f5dc4280          cba81d80          1        dummy0
+    253  2    f7c53180          c4866180          1        vg0-lv0
+    253  1    f746d280          f746cd80          1        mp0p1
+
+  Display the dm device information which the bio is submitted in.
+  The bio (ceacee80) is a clone of the bio (ceacee00) which is
+  submitted in the dm-3 (dummy0).  And the bio (ceacee00) is a clone
+  of the bio (ceaced80) which is submitted in the dm-4 (dummy1), too.
+  The bio (ceaced80) is the original bio.
+
+    crash> dminfo -b ceacee80
+    DM_BIO_ADDRESS    MAJ  MIN  MAP_DEV           DEVNAME
+    ceacee00          253  3    f5dc4280          dm-3
+    crash> dminfo -b ceacee00
+    DM_BIO_ADDRESS    MAJ  MIN  MAP_DEV           DEVNAME
+    ceaced80          253  4    d441e280          dm-4
+    crash> dminfo -b ceaced80
+    dminfo: invalid kernel virtual address: 64  type: "GET_VALUE: dm_io.bio"
+
+  Display dependency information for each target.
+  The vg0-snap0 depends on thd dm-6 (vg0-lv0-real) and the dm-7
+  (vg0-snap0-cow)
+
+    crash> dminfo -d
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  8    c4866c80          c4866280          1        vg0-snap0
+      MAJ  MIN  GENDISK           COUNT  DEVNAME
+      253  7    c4866980          1      dm-7
+      253  6    f6a04280          1      dm-6
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  6    f6a04a80          f6a04580          1        vg0-lv0-real
+      MAJ  MIN  GENDISK           COUNT  DEVNAME
+      8    0    f7f24c80          1      sda
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  7    c4866a80          c4866380          1        vg0-snap0-cow
+      MAJ  MIN  GENDISK           COUNT  DEVNAME
+      8    0    f7f24c80          1      sda
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  2    f7c53180          c4866180          1        vg0-lv0
+      MAJ  MIN  GENDISK           COUNT  DEVNAME
+      253  6    f6a04280          1      dm-6
+
+  Display queued I/O information for each target.
+  The information is displayed under the "PRIVATE_DATA" column.
+
+    crash> dminfo -q
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  5    f7c50c80          c488e480          1        via_cbeheddbdd
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8961080          mirror       (reads) (writes) (quiesced) (recovered)
+
+      --------------------------------------------------------------
+       "reads/writes" are members of the struct mirror_set, and
+       "quiesced/recovered" are members of the struct region_hash.
+       If the list is empty, the member is bracketed by "()".
+      --------------------------------------------------------------
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  0    c4840380          c4841880          1        mp0
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8802080          multipath    queue_size:0
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  1    f746d280          f746cd80          1        mp0p1
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8821080          linear       No queue info
+
+  Display status information for each target.
+  The information is displayed under the "PRIVATE_DATA" column.
+
+    crash> dminfo -s
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  0    c4840380          c4841880          1        mp0
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8802080          multipath    queue_if_no_path:0 hwh:none nr_pgs:1
+        PG  PG_STATUS  NR_PATHS  PATHS
+        1   active     2         8:16(A,0) 8:32(A,0)
+
+      --------------------------------------------------------------
+       Format of "PATHS": &lt;major>:&lt;minor>(&lt;status>,&lt;fail_count>)
+         Status: A:active, F:faulty
+         Fail_count: the value of the struct pgpath.fail_count
+      --------------------------------------------------------------
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  5    f7c50c80          c488e480          1        via_cbeheddbdd
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8961080          mirror       in_sync:1 dev:8:16(A,0),8:32(A,0)
+
+      --------------------------------------------------------------
+       Format of "dev": &lt;major>:&lt;minor>(&lt;status>,&lt;error_count>)
+         Status: A:active, D:degraded
+         Error_count: the value of the struct mirror.error_count
+      --------------------------------------------------------------
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  1    f746d280          f746cd80          1        mp0p1
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8821080          linear       No status info
+
+  Display table information for each target.
+  The information is displayed under the "PRIVATE_DATA" column.
+
+    crash> dminfo -t
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  8    c4866c80          c4866280          1        vg0-snap0
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f89b4080          snapshot     orig:253:6 cow:253:7 type:P chunk_size:16
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  6    f6a04a80          f6a04580          1        vg0-lv0-real
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f890f080          linear       begin:0 len:204800 dev:8:5 offset:384
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  0    c4840380          c4841880          1        mp0
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8802080          multipath    queue_if_no_path:0 hwh:none nr_pgs:1
+        PG  PATH_SELECTOR  NR_PATHS  PATHS
+        1   round-robin    2         8:16 8:32
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  5    f7c50c80          c488e480          1        via_cbeheddbdd
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8961080          mirror       log:core dev:8:16(0),8:32(0)
+
+      --------------------------------------------------------------
+       Format of "dev": &lt;major>:&lt;minor>(&lt;offset>)
+         Offset: the value of the struct mirror.offset
+      --------------------------------------------------------------
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  7    c4866a80          c4866380          1        vg0-snap0-cow
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f899d080          linear       begin:0 len:8192 dev:8:5 offset:205184
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  2    f7c53180          c4866180          1        vg0-lv0
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8bbc080          snapshot-origin  orig_dev:253:6
+
+    MAJ  MIN  MAP_DEV           DM_TABLE          TARGETS  MAPNAME
+    253  1    f746d280          f746cd80          1        mp0p1
+      TARGET            TARGET_TYPE  PRIVATE_DATA
+      f8821080          linear       begin:0 len:2040192 dev:253:0 offset:63
+
+
+</pre>
+</html>

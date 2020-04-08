@@ -1,0 +1,81 @@
+<html>
+
+<head>
+<meta http-equiv="expires" content="Wed, 19 Feb 2003 08:00:00 GMT">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#000066" vlink="#333399" alink="#FF0000">
+<pre>
+
+
+NAME
+  lscgroup - list all cgroups
+
+SYNOPSIS
+  lscgroup [[&lt;controllers>:&lt;path>] [...]] [[&lt;address>][...]]
+
+DESCRIPTION
+  The command list all present cgroups and their addresses, chosen cgroups
+  and their addresses or cgroup according to input address. When no parameter
+  is specified, the command list all cgroups which are present. When parameter
+  controller/path is specified, the command list subcgroups of cgroup specified
+  by parameter &lt;controllers>:&lt;path>, controllers in &lt;controllers>:&lt;path> can be
+  a comma separated controller list. When the input is hexadecimal address, the
+  command display the cgroup whose address equals to the specified parameter.
+
+EXAMPLE
+  display all cgroups:
+
+    crash>lscgroup
+         CGROUP       CONTROLLER:PATH
+    ffff8801188f8030  blkio:/
+    ffff8801188d3200  blkio:/libvirt
+    ffff88011a724600  blkio:/libvirt/lxc
+    ffff88011adac600  blkio:/libvirt/qemu
+    ffff8801151f6030  net_cls:/
+    ffff88011522a030  freezer:/
+    ffff8801158f9200  freezer:/libvirt
+    ffff88011a724800  freezer:/libvirt/lxc
+    ffff88011adac800  freezer:/libvirt/qemu
+    ffff880115264030  devices:/
+    ffff880115846e00  devices:/libvirt
+    ffff88011a724a00  devices:/libvirt/lxc
+    ffff88011adaca00  devices:/libvirt/qemu
+    ffff88011794c030  memory:/
+    ffff88011738ca00  memory:/libvirt
+    ffff88011a724c00  memory:/libvirt/lxc
+    ffff88011adacc00  memory:/libvirt/qemu
+    ffff880115b20030  cpuacct:/
+    ffff8801191ed600  cpuacct:/libvirt
+    ffff88011a08d200  cpuacct:/libvirt/lxc
+    ffff8801188d3e00  cpuacct:/libvirt/qemu
+    ffff88011923a030  cpu:/
+    ffff880115846600  cpu:/libvirt
+    ffff88011906e400  cpu:/libvirt/lxc
+    ffff880117be6400  cpu:/libvirt/qemu
+    ffff8801173f2030  cpuset:/
+    ffff8801179e6200  cpuset:/libvirt
+    ffff88011a08d000  cpuset:/libvirt/lxc
+    ffff880119fe8000  cpuset:/libvirt/qemu
+
+  display chosen cgroups:
+
+    crash>lscgroup cpu:/libvirt  cpu:/
+         CGROUP       CONTROLLER:PATH
+    ffff880115846600  cpu:/libvirt
+    ffff88011906e400  cpu:/libvirt/lxc
+    ffff880117be6400  cpu:/libvirt/qemu
+    ffff88011923a030  cpu:/
+    ffff880115846600  cpu:/libvirt
+    ffff88011906e400  cpu:/libvirt/lxc
+    ffff880117be6400  cpu:/libvirt/qemu
+       
+  display cgroup according to input address:
+
+    crash>lscgroup ffff880119fe8000 ffff880115846600
+         CGROUP       CONTROLLER:PATH
+    ffff880119fe8000  cpuset:/libvirt/qemu
+    ffff880115846600  cpu:/libvirt
+
+
+</pre>
+</html>

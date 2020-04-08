@@ -1,0 +1,54 @@
+<html>
+
+<head>
+<meta http-equiv="expires" content="Wed, 19 Feb 2003 08:00:00 GMT">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#000066" vlink="#333399" alink="#FF0000">
+<pre>
+
+NAME
+  cls - list dentry and inode caches
+
+SYNOPSIS
+  cls [-adU] abspath...
+
+DESCRIPTION
+  This command displays the addresses of dentry, inode and i_mapping,
+  and nrpages of a specified absolute path and its subdirs if it exists
+  in dentry cache.
+
+    -a  also display negative dentries in the subdirs list.
+    -d  display the directory itself only, without its contents.
+    -U  do not sort, list dentries in directory order.
+
+EXAMPLE
+  Display the "/var/log/messages" regular file's information:
+
+    crash> cls /var/log/messages
+    DENTRY           INODE            I_MAPPING        NRPAGES   % PATH
+    ffff9c0c28fda480 ffff9c0c22c675b8 ffff9c0c22c67728     220 100 /var/log/messages
+
+  The '%' column shows the percentage of cached pages in the file.
+
+  Display the "/var/log" directory and its subdirs information:
+
+    crash> cls /var/log
+    DENTRY           INODE            I_MAPPING        NRPAGES   % PATH
+    ffff9c0c3eabe300 ffff9c0c3e875b78 ffff9c0c3e875ce8       0   0 ./
+    ffff9c0c16a22900 ffff9c0c16ada2f8 ffff9c0c16ada468       0   0 anaconda/
+    ffff9c0c37611000 ffff9c0c3759f5b8 ffff9c0c3759f728       0   0 audit/
+    ffff9c0c375ccc00 ffff9c0c3761c8b8 ffff9c0c3761ca28       1 100 btmp
+    ffff9c0c28fda240 ffff9c0c22c713f8 ffff9c0c22c71568       6 100 cron
+    ffff9c0c3eb7f180 ffff9c0bfd402a78 ffff9c0bfd402be8      36   7 dnf.librepo.log
+    ...
+
+  Display the "/var/log" directory itself only:
+
+    crash> cls -d /var/log
+    DENTRY           INODE            I_MAPPING        NRPAGES   % PATH
+    ffff9c0c3eabe300 ffff9c0c3e875b78 ffff9c0c3e875ce8       0   0 /var/log/
+
+
+</pre>
+</html>
+

@@ -1,0 +1,48 @@
+<html>
+
+<head>
+<meta http-equiv="expires" content="Wed, 19 Feb 2003 08:00:00 GMT">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#000066" vlink="#333399" alink="#FF0000">
+<pre>
+
+
+NAME
+  qemu-vtop - KVM guest's address to host's address
+
+SYNOPSIS
+  qemu-vtop -g [pid | taskp] -p address ...
+
+DESCRIPTION
+  This command translates a guest's address on a KVM to its host's physical
+  address. It first gets the host's virtual address related to the guest's
+  address, then display the information of "vtop &lt;host's virtual address>".
+ 
+   -p address          The address is a physical address of a guest
+   -g [pid | taskp]    Translate the guest's address of the KVM specified by
+                       PID(pid) or hexadecimal task_struct pointer(taskp).
+
+EXAMPLE
+  Translate guest(pid:191579)'s physical address 34de5840:
+ 
+    crash> qemu-vtop -g 191579 -p 34de5840
+    GUEST PHYSICAL    HOST VIRTUAL      HOST PHYSICAL
+    34de5840          7f060cbe5840      611de5840
+ 
+       PML: 72dbb67f0 => 875afa067
+       PUD: 875afa0c0 => 736871067
+       PMD: 736871328 => 8000000611c000e7
+      PAGE: 611c00000  (2MB)
+ 
+          PTE         PHYSICAL   FLAGS
+    8000000611c000e7  611c00000  (PRESENT|RW|USER|ACCESSED|DIRTY|PSE|NX)
+ 
+          VMA           START       END     FLAGS FILE
+    ffff8806edca49e0 7f05d7e00000 7f0697e00000 80120073
+ 
+          PAGE        PHYSICAL      MAPPING       INDEX CNT FLAGS
+    ffffea00153e8a18 611de5000                0 7f9e743e5  0 c0000000008000
+
+
+</pre>
+</html>
